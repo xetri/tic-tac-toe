@@ -3,7 +3,6 @@
 #define SDL_C
 #include "../include/SDL2/SDL.h"
 #include "../include/SDL2/SDL_ttf.h"
-
 #include "./start.c"
 
 int main(int argc, char **argv) {
@@ -33,12 +32,7 @@ int main(int argc, char **argv) {
     fprintf(stderr, "%s", TTF_GetError());
     return -1;
   }
-
-  if (SDL_UpdateWindowSurface(window) < 0){
-    fprintf(stderr, "%s", SDL_GetError());
-    return -1;
-  }
-
+  
   Start(renderer);
 
   TTF_Quit();
