@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #define SDL_C
 #include "../include/SDL2/SDL.h"
 #include "../include/SDL2/SDL_ttf.h"
@@ -7,7 +5,7 @@
 
 int main(int argc, char **argv) {
 
-  if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+  if (SDL_Init(SDL_INIT_EVENTS) < 0 && SDL_Init(SDL_INIT_VIDEO) > 0) {
     fprintf(stderr, "%s", SDL_GetError());
     return -1;
   }
@@ -21,7 +19,7 @@ int main(int argc, char **argv) {
   }
 
   SDL_Renderer *renderer =
-      SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+      SDL_CreateRenderer(window, -1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
 
   if (!renderer) {
     fprintf(stderr, "%s", SDL_GetError());

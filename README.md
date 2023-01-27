@@ -1,7 +1,7 @@
-# Digital Clock
+# Tic Tac Toe
 
 ## Description
-Digital clock made in c using SDL2
+Tic Tac Toe made in c using SDL2
 
 ### Note:
 - Surely to run in windows with gcc/clang/tcc compiler with flags mentioned in the [Makefile](.//Makefile) but dont know about other OS
