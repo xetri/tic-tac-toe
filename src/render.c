@@ -1,17 +1,13 @@
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 #ifndef SDL_C
 #define SDL_C
 #include "../include/SDL2/SDL.h"
-#include "../include/SDL2/SDL_ttf.h"
 #endif
 
 #include "./def.c"
-#define TILEN 3
-#define CELLW (float)win.W / TILEN
-#define CELLH (float)win.H / TILEN
-
 
 void render_board(SDL_Renderer *renderer, SDL_Color color) {
   SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
@@ -23,64 +19,112 @@ void render_board(SDL_Renderer *renderer, SDL_Color color) {
   }
 }
 
-void render_o(SDL_Renderer *renderer, SDL_Color color) {
-  int o;
-  float angle, radius = fmin(win.W, win.H) / pow(TILEN, 2);
+void render_o(SDL_Renderer *renderer, int cell, SDL_Color color) {
+  SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
-  SDL_SetRenderDrawColor(renderer, color.r, color.g,
-                         color.b, color.a);
-  for (o = 0; o < game.o_len; ++o) {
-    Vec2 pos = get_centerof_block(game.o_pos[o]);
-    for (angle = 0; angle <= 2 * M_PI; angle += 0.01) {
-      int x = pos.x + radius * cos(angle), y = pos.y + radius * sin(angle);
-      SDL_RenderDrawPoint(renderer, x, y);
+  float angle, radius = fmin(win.W, win.H) / pow(TILEN, 2);
+  Vec2 center = get_centerof_block(cell);
+  for (angle = 0; angle <= 2 * M_PI; angle += 0.01) {
+    int x = center.x + radius * cos(angle), y = center.y + radius * sin(angle);
+    SDL_RenderDrawPoint(renderer, x, y);
+  }
+}
+
+void render_x(SDL_Renderer *renderer, int cell, SDL_Color color) {
+  SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+
+  Vec2 center = get_centerof_block(cell);
+  SDL_RenderDrawLine(renderer, center.x - CELLW / 4, center.y - CELLH / 4,
+                     center.x + CELLW / 4, center.y + CELLH / 4);
+  SDL_RenderDrawLine(renderer, center.x - CELLW / 4, center.y + CELLH / 4,
+                     center.x + CELLW / 4, center.y - CELLH / 4);
+}
+
+void render_player(SDL_Renderer *renderer, SDL_Color x_color,
+                   SDL_Color o_color) {
+  int i;
+  for (i = 0; i < game.len; i++) {
+    switch (game.board[i]) {
+    case X:
+      render_x(renderer, i + 1, x_color);
+      break;
+    case O:
+      render_o(renderer, i + 1, o_color);
+      break;
+    default: {
+    }
     }
   }
 }
 
-void render_x(SDL_Renderer *renderer, SDL_Color color) {
-  int x;
+bool has_player_won(Player player) {
+  int row_c = 0, col_c = 0;
+  int diag1_c = 0, diag2_c = 0;
+  int i, j;
 
-  SDL_SetRenderDrawColor(renderer, color.r, color.g,
-                         color.b, color.a);
-  for (x = 0; x < game.x_len; ++x) {
-    Vec2 pos = get_centerof_block(game.x_pos[x]);
-    SDL_RenderDrawLine(renderer, pos.x - CELLW/4, pos.y - CELLH/4, pos.x + CELLW/4, pos.y + CELLH/4);
-    SDL_RenderDrawLine(renderer, pos.x - CELLW/4, pos.y + CELLH/4, pos.x + CELLW/4, pos.y - CELLH/4);
+  for (i = 0; i < TILEN; i++) {
+    for (j = 0; j < TILEN; j++) {
+      if (game.board[i * TILEN + j] == player)
+        row_c++;
+      if (game.board[j * TILEN + i] == player)
+        col_c++;
+    }
+
+    if (row_c >= TILEN || col_c >= TILEN)
+      return true;
+
+    row_c = 0;
+    col_c = 0;
+
+    if (game.board[i * TILEN + i] == player)
+      diag1_c++;
+    if (game.board[i * TILEN + TILEN - i - 1] == player)
+      diag2_c++;
   }
+
+  return diag1_c >= TILEN || diag2_c >= TILEN;
+}
+
+bool is_draw() {
+  int i, none = 0;
+
+  for (i = 0; i < game.len; i++) {
+    if (game.board[i] == NONE) {
+      none++;
+    }
+  }
+
+  if (none > 0)
+    return false;
+  return true;
 }
 
 void add_o_move(SDL_Renderer *renderer, int cell) {
-  int o;
-  for (o = 0; o < game.len; ++o){
-    if (cell == game.pos[o]){
-      return;
-    }
-  }
+  if (game.board[cell - 1] != NONE)
+    return;
 
-  game.pos[game.len] = cell;
-  game.len += 1;
-
-  game.o_pos[game.o_len] = cell;
-  game.o_len += 1;
-
+  game.board[cell - 1] = O;
   game.turn = X;
 
+  if (has_player_won(O)) {
+    game.winner = O;
+    game.status = WON;
+  } else if (is_draw()) {
+    game.status = DRAW;
+  }
 }
 
 void add_x_move(SDL_Renderer *renderer, int cell) {
-  int x;
-  for (x = 0; x < game.len; ++x){
-    if (cell == game.pos[x]){
-      return;
-    }
-  }
+  if (game.board[cell - 1] != NONE)
+    return;
 
-  game.pos[game.len] = cell;
-  game.len += 1;
-
-  game.x_pos[game.x_len] = cell;
-  game.x_len += 1;
-
+  game.board[cell - 1] = X;
   game.turn = O;
+
+  if (has_player_won(X)) {
+    game.winner = X;
+    game.status = WON;
+  } else if (is_draw()) {
+    game.status = DRAW;
+  }
 }

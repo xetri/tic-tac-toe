@@ -3,7 +3,7 @@ MAIN = main
 L = c
 OUT = out
 O = $(OUT)
-CFLAGS = -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf
+CFLAGS = -Llib -lmingw32 -lSDL2main -lSDL2
 
 .SILENT:
 build:

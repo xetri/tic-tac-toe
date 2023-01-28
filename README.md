@@ -9,9 +9,6 @@ Tic Tac Toe made in c using SDL2
 
 ### Resources:
 - [SDL2](https://github.com/libsdl-org/SDL/releases/tag/release-2.26.2)
-- [SDL2_ttf](https://github.com/libsdl-org/SDL_ttf/releases/tag/release-2.20.1)
-- [OpenSans Font](https://fonts.google.com/specimen/Open+Sans?query=Open+Sans)
-
 
 ### Run
 
@@ -22,3 +19,4 @@ mkdir -p out
 gcc .\src\main.c -o .\out\main.exe -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf
 .\out\main.exe
 ```
+

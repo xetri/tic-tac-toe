@@ -1,6 +1,7 @@
+#include <stdio.h>
+
 #define SDL_C
 #include "../include/SDL2/SDL.h"
-#include "../include/SDL2/SDL_ttf.h"
 #include "./start.c"
 
 int main(int argc, char **argv) {
@@ -26,14 +27,8 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  if (TTF_Init() < 0){
-    fprintf(stderr, "%s", TTF_GetError());
-    return -1;
-  }
-  
   Start(renderer);
 
-  TTF_Quit();
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
   SDL_Quit();
