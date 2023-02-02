@@ -16,7 +16,7 @@ Tic Tac Toe made in c using SDL2
 
 ```cmd
 mkdir -p out
-gcc .\src\main.c -o .\out\main.exe -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf
+gcc .\src\main.c -o .\out\main.exe -Llib -lmingw32 -lSDL2main -lSDL2
 .\out\main.exe
 ```
 
