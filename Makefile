@@ -2,7 +2,7 @@ CC = gcc
 MAIN = main
 L = c
 OUT = out
-O = $(OUT)
+O = exe
 CFLAGS = -Llib -lmingw32 -lSDL2main -lSDL2
 
 .SILENT:
@@ -14,6 +14,6 @@ run:
 	mkdir -p out
 	./$(OUT)/$(MAIN).$(O)
 
-o:
+all:
 	make build
 	make run
