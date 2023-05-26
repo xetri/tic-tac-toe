@@ -1,12 +1,5 @@
 #include <math.h>
-#include <stdbool.h>
-#include <stdio.h>
-
-#ifndef SDL_C
-#define SDL_C
-#include "../include/SDL2/SDL.h"
-#endif
-
+#include <SDL2/SDL.h>
 #include "./def.c"
 
 void render_board(SDL_Renderer *renderer, SDL_Color color) {
@@ -43,21 +36,14 @@ void render_x(SDL_Renderer *renderer, int cell, SDL_Color color) {
 void render_player(SDL_Renderer *renderer, SDL_Color x_color,
                    SDL_Color o_color) {
   int i;
-  for (i = 0; i < game.len; i++) {
-    switch (game.board[i]) {
-    case X:
-      render_x(renderer, i + 1, x_color);
-      break;
-    case O:
-      render_o(renderer, i + 1, o_color);
-      break;
-    default: {
-    }
-    }
+  for (i = 0; i < game.len; i++)  switch (game.board[i]) {
+    case X: render_x(renderer, i + 1, x_color); break;
+    case O: render_o(renderer, i + 1, o_color); break;
+    default: {}
   }
 }
 
-bool has_player_won(Player player) {
+int has_player_won(Player player) {
   int row_c = 0, col_c = 0;
   int diag1_c = 0, diag2_c = 0;
   int i, j;
@@ -70,8 +56,7 @@ bool has_player_won(Player player) {
         col_c++;
     }
 
-    if (row_c >= TILEN || col_c >= TILEN)
-      return true;
+    if (row_c >= TILEN || col_c >= TILEN) return 1;
 
     row_c = 0;
     col_c = 0;
@@ -85,7 +70,7 @@ bool has_player_won(Player player) {
   return diag1_c >= TILEN || diag2_c >= TILEN;
 }
 
-bool is_draw() {
+int is_draw() {
   int i, none = 0;
 
   for (i = 0; i < game.len; i++) {
@@ -94,9 +79,8 @@ bool is_draw() {
     }
   }
 
-  if (none > 0)
-    return false;
-  return true;
+  if (none > 0) return 0;
+  return 1;
 }
 
 void add_o_move(SDL_Renderer *renderer, int cell) {
